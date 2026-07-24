@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LUMI — Materiais Pedagógicos Gratuitos</title>
+<meta name="description" content="Atividades pedagógicas gratuitas para educação infantil e alfabetização. Baixe, imprima e use — tudo de graça, feito com carinho pela turma LUMI.">
+<link rel="icon" type="image/png" href="img/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:ital,wght@0,400;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<!--
+  ============ GOOGLE ADSENSE ============
+  Quando sua conta AdSense for aprovada, cole aqui o script principal
+  (substitua ca-pub-XXXXXXXXXXXXXXXX pelo seu ID de editor):
+
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX" crossorigin="anonymous"></script>
+  ========================================
+-->
+</head>
+<body>
+
+<header class="topo">
+  <div class="container topo-inner">
+    <a href="#" class="marca">
+      <img src="img/logo.png" alt="LUMI — Materiais Pedagógicos" class="marca-logo">
+    </a>
+    <nav class="menu">
+      <a href="#materiais">Materiais</a>
+      <a href="#turma">A Turma</a>
+      <a href="#sobre">Sobre</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="container hero-inner">
+    <div class="hero-texto">
+      <span class="hero-selo">✨ 100% gratuito, para sempre</span>
+      <h1>Materiais pedagógicos <em>gratuitos</em> para crianças aprenderem brincando</h1>
+      <p>Atividades de alfabetização, coordenação motora, matemática e muito mais — prontas para <strong>baixar e imprimir</strong>. Feitas com carinho para famílias, professoras e professores.</p>
+      <div class="hero-acoes">
+        <a href="#materiais" class="btn btn-primario">Ver os materiais 🎒</a>
+        <a href="#turma" class="btn btn-suave">Conhecer a turma</a>
+      </div>
+      <p class="hero-nota">Sem cadastro. Sem pagar nada. É só baixar, imprimir e aprender. 💛</p>
+    </div>
+    <div class="hero-arte">
+      <img src="img/poster.png" alt="A turma LUMI reunida: Criar, ensinar e transformar juntos!">
+    </div>
+  </div>
+  <div class="onda" aria-hidden="true">
+    <svg viewBox="0 0 1440 70" preserveAspectRatio="none"><path d="M0,40 C240,80 480,0 720,30 C960,60 1200,10 1440,40 L1440,70 L0,70 Z" fill="#FFFFFF"/></svg>
+  </div>
+</section>
+
+<main>
+  <section id="materiais" class="secao secao-branca">
+    <div class="container">
+      <h2 class="titulo-secao"><span class="rabisco azul"></span>Materiais para baixar e imprimir</h2>
+      <p class="sub-secao">Clique em <strong>Visualizar</strong> para ver antes, <strong>Baixar</strong> para salvar o PDF ou <strong>Imprimir</strong> para já mandar para a impressora.</p>
+
+      <div class="filtros" id="filtros" hidden>
+        <button class="filtro ativo" data-cat="todos">Todos</button>
+      </div>
+
+      <div id="lista-materiais" class="grade-materiais"></div>
+
+      <div id="vazio" class="vazio" hidden>
+        <p>🖍️ Os primeiros materiais estão chegando! Volte em breve.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Espaço de publicidade (discreto). Quando o AdSense for aprovado,
+       substitua o conteúdo interno pelo bloco de anúncio responsivo. -->
+  <div class="container">
+    <div class="ad-slot" aria-label="publicidade">
+      <span class="ad-rotulo">publicidade</span>
+      <!-- Cole aqui o <ins class="adsbygoogle"> do seu bloco de anúncio -->
+    </div>
+  </div>
+
+  <section id="turma" class="secao secao-creme">
+    <div class="container">
+      <h2 class="titulo-secao"><span class="rabisco amarelo"></span>Conheça a turma LUMI</h2>
+      <p class="sub-secao">Seis amigos que acompanham as crianças em cada atividade. 🐾</p>
+      <div class="grade-turma">
+        <article class="card-personagem" style="--cor:#E53935">
+          <img src="img/personagens/sofia.png" alt="Sofia" class="foto-personagem">
+          <div>
+            <h3>Sofia</h3>
+            <p>Curiosa e criativa, adora observar, perguntar e entender o mundo. Nunca larga seu caderninho!</p>
+          </div>
+        </article>
+        <article class="card-personagem" style="--cor:#2E7D32">
+          <img src="img/personagens/pedro.png" alt="Pedro" class="foto-personagem">
+          <div>
+            <h3>Pedro</h3>
+            <p>Forte, alegre e acolhedor. Está sempre pronto para ajudar e fazer novos amigos.</p>
+          </div>
+        </article>
+        <article class="card-personagem" style="--cor:#7D62B8">
+          <img src="img/personagens/livia.png" alt="Lívia" class="foto-personagem">
+          <div>
+            <h3>Lívia</h3>
+            <p>A mais alta da turma! Organizada, delicada e criativa, com sua tiara de orelhinhas de gato.</p>
+          </div>
+        </article>
+        <article class="card-personagem" style="--cor:#086B8E">
+          <img src="img/personagens/enzo.png" alt="Enzo" class="foto-personagem">
+          <div>
+            <h3>Enzo</h3>
+            <p>O menor e mais curioso: adora explorar, descobrir coisas novas e viver aventuras.</p>
+          </div>
+        </article>
+        <article class="card-personagem" style="--cor:#F0A500">
+          <img src="img/personagens/clara.png" alt="Clara" class="foto-personagem">
+          <div>
+            <h3>Clara</h3>
+            <p>Alegre, comunicativa e cheia de energia. Seu colar de quebra-cabeça é símbolo de inclusão e respeito.</p>
+          </div>
+        </article>
+        <article class="card-personagem" style="--cor:#4A6FA5">
+          <img src="img/personagens/bolt.png" alt="Bolt" class="foto-personagem">
+          <div>
+            <h3>Bolt</h3>
+            <p>O filhote de dálmata da turma! Brincalhão, carinhoso e sempre pronto para uma nova brincadeira.</p>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section id="sobre" class="secao secao-branca">
+    <div class="container sobre-grade">
+      <div>
+        <h2 class="titulo-secao"><span class="rabisco verde"></span>Sobre a LUMI</h2>
+        <p>A LUMI nasceu de um sonho simples: que <strong>toda criança tenha acesso a materiais pedagógicos de qualidade</strong>, não importa onde estude ou quanto sua família possa pagar.</p>
+        <p>Cada atividade segue uma metodologia própria de desenvolvimento infantil, com progressão de habilidades, layout pensado para a criança e revisão cuidadosa antes de publicar.</p>
+        <p><strong>Tudo aqui é e sempre será gratuito</strong> para baixar, imprimir e usar em casa ou na escola. Se este site te ajudou, compartilhe com outras famílias e educadores — é assim que a luz da LUMI se espalha! ☀️</p>
+      </div>
+      <div class="sobre-destaques">
+        <div class="destaque"><span>🖨️</span><p>Pronto para imprimir em folha A4</p></div>
+        <div class="destaque"><span>🎓</span><p>Com base em metodologia pedagógica</p></div>
+        <div class="destaque"><span>💛</span><p>Gratuito para famílias e escolas</p></div>
+        <div class="destaque"><span>🏠</span><p>Para usar em casa ou na sala de aula</p></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="rodape">
+  <div class="container rodape-inner">
+    <img src="img/logo.png" alt="LUMI" class="rodape-logo">
+    <p>Criar, ensinar e transformar juntos! 💛</p>
+    <nav class="rodape-links">
+      <a href="#materiais">Materiais</a>
+      <a href="#sobre">Sobre</a>
+      <a href="privacidade.html">Política de Privacidade</a>
+    </nav>
+    <p class="rodape-mini">© <span id="ano"></span> LUMI Materiais Pedagógicos. Os materiais são gratuitos para uso pessoal e em sala de aula; venda não autorizada.</p>
+  </div>
+</footer>
+
+<script src="materiais.js"></script>
+<script src="site.js"></script>
+</body>
+</html>
