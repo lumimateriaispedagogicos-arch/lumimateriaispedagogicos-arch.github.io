@@ -1,5 +1,6 @@
-// Navegação por categorias: a home mostra cartões de assunto;
-// clicar num assunto abre a lista de PDFs daquela categoria.
+// Navegação em 3 níveis: Assuntos → Coleções (subpastas) → PDFs.
+// Materiais com o campo "colecao" ficam agrupados numa pastinha
+// dentro do assunto; materiais sem "colecao" aparecem direto.
 (function () {
   const destaques = document.getElementById("destaques");
   const gradeCategorias = document.getElementById("grade-categorias");
@@ -17,7 +18,6 @@
 
   const CORES_PADRAO = ["#4A6FA5", "#F2B33D", "#7C9A6D", "#D96A5A", "#7D62B8", "#086B8E"];
 
-  // Ícone e cor de cada assunto (categorias novas ganham o padrão 📚)
   const ICONES = {
     "Alfabetização": "🔤",
     "Consciência Fonológica": "🗣️",
@@ -51,18 +51,23 @@
     "Temáticos",
   ];
 
+  const TEXTO_HOME = "Escolha um assunto para ver as atividades. Tudo gratuito: é só <strong>visualizar</strong>, <strong>baixar</strong> ou <strong>imprimir</strong>.";
+
+  function capaDe(m) {
+    return m.capa || m.arquivo.replace("materiais/", "img/capas/").replace(".pdf", ".jpg");
+  }
+
   function cartaoMaterial(m, i) {
     const cor = m.cor || CORES_PADRAO[i % CORES_PADRAO.length];
     const meta = [m.idade, m.paginas ? m.paginas + " página" + (m.paginas > 1 ? "s" : "") : null]
       .filter(Boolean).join(" · ");
-    const capa = m.capa || m.arquivo.replace("materiais/", "img/capas/").replace(".pdf", ".jpg");
     const el = document.createElement("article");
     el.className = "card-material" + (m.destaque ? " card-destaque" : "");
     el.style.setProperty("--cor", cor);
     el.innerHTML =
       (m.destaque ? '<span class="selo-destaque">⭐ Destaque</span>' : "") +
       '<a class="capa-link" href="' + m.arquivo + '" target="_blank" rel="noopener" title="Visualizar ' + m.titulo + '">' +
-      '<img class="capa" src="' + capa + '" alt="Prévia: ' + m.titulo + '" loading="lazy"></a>' +
+      '<img class="capa" src="' + capaDe(m) + '" alt="Prévia: ' + m.titulo + '" loading="lazy"></a>' +
       '<div class="card-corpo">' +
       '<span class="cat">' + (m.categoria || "Atividade") + "</span>" +
       "<h3>" + m.titulo + "</h3>" +
@@ -81,7 +86,7 @@
   const comuns = MATERIAIS.filter(function (m) { return !m.destaque; });
   emDestaque.forEach(function (m, i) { destaques.appendChild(cartaoMaterial(m, i)); });
 
-  // Monta os cartões de assunto com a contagem de atividades
+  // ----- Nível 1: assuntos -----
   const categorias = [];
   comuns.forEach(function (m) {
     const c = m.categoria || "Outros";
@@ -89,8 +94,6 @@
     if (existente) existente.qtd++;
     else categorias.push({ nome: c, qtd: 1 });
   });
-
-  // Acrescenta os assuntos fixos que ainda não têm atividade (viram "Em breve")
   CATEGORIAS_FIXAS.forEach(function (nome) {
     if (!categorias.find(function (x) { return x.nome === nome; })) {
       categorias.push({ nome: nome, qtd: 0 });
@@ -114,25 +117,69 @@
     gradeCategorias.appendChild(b);
   });
 
-  function abrirCategoria(nome) {
-    lista.innerHTML = "";
-    comuns
-      .filter(function (m) { return (m.categoria || "Outros") === nome; })
-      .forEach(function (m, i) { lista.appendChild(cartaoMaterial(m, i)); });
-    gradeCategorias.hidden = true;
-    destaques.hidden = true;
-    visaoCategoria.hidden = false;
-    subTitulo.innerHTML = "Atividades de <strong>" + nome + "</strong> — clique para visualizar, baixar ou imprimir.";
+  function mostrarVisao(conteudoDaCategoria) {
+    gradeCategorias.hidden = conteudoDaCategoria;
+    destaques.hidden = conteudoDaCategoria;
+    visaoCategoria.hidden = !conteudoDaCategoria;
     document.getElementById("materiais").scrollIntoView({ behavior: "smooth" });
   }
 
-  function voltarCategorias() {
-    visaoCategoria.hidden = true;
-    gradeCategorias.hidden = false;
-    destaques.hidden = false;
-    subTitulo.innerHTML = "Escolha um assunto para ver as atividades. Tudo gratuito: é só <strong>visualizar</strong>, <strong>baixar</strong> ou <strong>imprimir</strong>.";
+  let acaoVoltar = null;
+
+  // ----- Nível 2: dentro do assunto (coleções + materiais avulsos) -----
+  function abrirCategoria(nome) {
+    lista.innerHTML = "";
+    const doAssunto = comuns.filter(function (m) { return (m.categoria || "Outros") === nome; });
+
+    const colecoes = [];
+    doAssunto.forEach(function (m) {
+      if (!m.colecao) return;
+      const ex = colecoes.find(function (x) { return x.nome === m.colecao; });
+      if (ex) ex.itens.push(m);
+      else colecoes.push({ nome: m.colecao, itens: [m] });
+    });
+    const avulsos = doAssunto.filter(function (m) { return !m.colecao; });
+
+    const cor = CORES_CATEGORIA[nome] || "#4A6FA5";
+    colecoes.forEach(function (col) {
+      const b = document.createElement("button");
+      b.className = "card-colecao";
+      b.style.setProperty("--cor", cor);
+      b.innerHTML =
+        '<img class="colecao-capa" src="' + capaDe(col.itens[0]) + '" alt="" loading="lazy">' +
+        '<div class="colecao-info">' +
+        '<span class="colecao-pasta">📁 Coleção</span>' +
+        "<h3>" + col.nome + "</h3>" +
+        '<span class="cat-qtd">' + col.itens.length + (col.itens.length > 1 ? " atividades" : " atividade") + "</span>" +
+        "</div>";
+      b.addEventListener("click", function () { abrirColecao(nome, col); });
+      lista.appendChild(b);
+    });
+    avulsos.forEach(function (m, i) { lista.appendChild(cartaoMaterial(m, i)); });
+
+    subTitulo.innerHTML = "Atividades de <strong>" + nome + "</strong>" +
+      (colecoes.length ? " — escolha uma coleção." : " — clique para visualizar, baixar ou imprimir.");
+    btnVoltar.textContent = "← Voltar aos assuntos";
+    acaoVoltar = voltarParaHome;
+    mostrarVisao(true);
   }
-  btnVoltar.addEventListener("click", voltarCategorias);
+
+  // ----- Nível 3: dentro da coleção (os PDFs) -----
+  function abrirColecao(categoria, col) {
+    lista.innerHTML = "";
+    col.itens.forEach(function (m, i) { lista.appendChild(cartaoMaterial(m, i)); });
+    subTitulo.innerHTML = "<strong>" + col.nome + "</strong> (" + categoria + ") — clique para visualizar, baixar ou imprimir.";
+    btnVoltar.textContent = "← Voltar para " + categoria;
+    acaoVoltar = function () { abrirCategoria(categoria); };
+    mostrarVisao(true);
+  }
+
+  function voltarParaHome() {
+    subTitulo.innerHTML = TEXTO_HOME;
+    mostrarVisao(false);
+  }
+
+  btnVoltar.addEventListener("click", function () { if (acaoVoltar) acaoVoltar(); });
 
   // Imprimir: abre o PDF num iframe oculto e chama a impressão;
   // se o navegador bloquear, abre o PDF em nova aba.

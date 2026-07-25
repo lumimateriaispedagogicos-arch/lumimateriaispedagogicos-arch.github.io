@@ -91,11 +91,20 @@ for pdf in sorted(glob.glob(os.path.join(ORIGEM, "*.pdf"))):
     # 3) entrada no catalogo
     cat, idade = categoria_de(nome)
     cor = CORES[(catalogo.count("titulo:") + len(novos)) % len(CORES)]
+    titulo = titulo_de(nome)
+    # Series "... LETRA X" viram colecao (subpasta) dentro do assunto
+    colecao = ""
+    m_letra = re.search(r"(.*?)\s*—?\s*Letra [A-Z]$", titulo)
+    if m_letra:
+        base = m_letra.group(1).strip()
+        colecao = "Apostilas das Letras" if base.lower() == cat.lower() else base
+    entrada_colecao = ('    colecao: "' + colecao + '",\n') if colecao else ""
     entrada = (
         "  {\n"
-        '    titulo: "' + titulo_de(nome) + '",\n'
+        '    titulo: "' + titulo + '",\n'
         '    descricao: "' + str(paginas) + ' páginas de atividades para baixar e imprimir.",\n'
         '    categoria: "' + cat + '",\n'
+        + entrada_colecao
         '    idade: "' + idade + '",\n'
         "    paginas: " + str(paginas) + ",\n"
         '    arquivo: "materiais/' + arquivo_web + '",\n'
