@@ -87,4 +87,13 @@ const MATERIAIS = [
     arquivo: "materiais/consciencia-fonologica-letra-g.pdf",
     cor: "#C0564B"
   },
+  {
+    titulo: "A Turma LUMI para Colorir — Volume 1",
+    descricao: "14 desenhos da turma LUMI em cenas do dia a dia: Lívia no parquinho, Clara dançando em casa, Enzo no skate, Pedro no piquenique e brincando com o Bolt, Sofia na biblioteca e tomando sorvete. Cada página tem campo de nome, turma e data.",
+    categoria: "Desenhos para Colorir",
+    idade: "2 a 6 anos",
+    paginas: 14,
+    arquivo: "materiais/turma-lumi-para-colorir-vol-1.pdf",
+    cor: "#D96A5A"
+  },
 ];
