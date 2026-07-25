@@ -29,6 +29,7 @@ const CORES_CATEGORIA = {
 
 // Assuntos que aparecem na home mesmo antes de terem atividades ("Em breve")
 const CATEGORIAS_FIXAS = [
+  "Desenhos para Colorir",
   "Matemática",
   "Raciocínio Lógico",
   "Interpretação de Texto",
