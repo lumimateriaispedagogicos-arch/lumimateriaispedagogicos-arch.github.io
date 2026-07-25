@@ -28,8 +28,16 @@
     // ----- PDFs de uma coleção -----
     tituloPagina(colecao);
     sub.innerHTML = "Coleção de <strong>" + cat + "</strong> — clique para visualizar, baixar ou imprimir. Tudo gratuito!";
-    voltar.textContent = "← Voltar para " + cat;
-    voltar.href = "categoria.html?cat=" + encodeURIComponent(cat);
+    // Se esta é a única coleção do assunto (sem avulsos), a pessoa veio
+    // direto da home — o voltar leva de volta aos assuntos.
+    const outras = doAssunto.filter(function (m) { return m.colecao !== colecao; });
+    if (outras.length === 0) {
+      voltar.textContent = "← Voltar aos assuntos";
+      voltar.href = "index.html#materiais";
+    } else {
+      voltar.textContent = "← Voltar para " + cat;
+      voltar.href = "categoria.html?cat=" + encodeURIComponent(cat);
+    }
     doAssunto
       .filter(function (m) { return m.colecao === colecao; })
       .forEach(function (m, i) { lista.appendChild(cartaoMaterial(m, i)); });
