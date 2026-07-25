@@ -111,6 +111,7 @@ img{max-width:100%;display:block}
   box-shadow:var(--sombra);padding:28px 18px 22px;cursor:pointer;
   display:flex;flex-direction:column;align-items:center;gap:8px;
   font-family:'Baloo 2',cursive;transition:.2s;
+  text-decoration:none;color:inherit;
 }
 .card-categoria:hover{transform:translateY(-5px) rotate(-.5deg);background:var(--branco)}
 .cat-icone{font-size:2.6rem;line-height:1}
@@ -126,6 +127,7 @@ img{max-width:100%;display:block}
   border-left:8px solid var(--cor,var(--azul));box-shadow:var(--sombra);
   padding:16px;cursor:pointer;display:flex;gap:16px;align-items:center;
   text-align:left;font-family:'Baloo 2',cursive;transition:.2s;
+  text-decoration:none;color:inherit;
 }
 .card-colecao:hover{transform:translateY(-4px);background:var(--branco)}
 .colecao-capa{
@@ -151,7 +153,10 @@ img{max-width:100%;display:block}
   font-family:'Baloo 2',cursive;font-size:1rem;font-weight:700;
   background:var(--creme);color:var(--azul);border:2px solid var(--creme-escuro);
   border-radius:999px;padding:9px 22px;cursor:pointer;margin-bottom:22px;transition:.2s;
+  display:inline-block;text-decoration:none;
 }
+.pagina-categoria{min-height:60vh}
+.pagina-categoria h1{margin-top:10px}
 .btn-voltar:hover{background:var(--amarelo-claro);border-color:var(--amarelo)}
 
 /* ===== Cards de materiais ===== */
