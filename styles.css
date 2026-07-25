@@ -120,6 +120,9 @@ img{max-width:100%;display:block}
   color:var(--cor,var(--azul));background:var(--branco);
   padding:3px 12px;border-radius:999px;
 }
+.card-categoria.embreve{cursor:default;opacity:.75}
+.card-categoria.embreve:hover{transform:none;background:var(--creme)}
+.card-categoria.embreve .cat-qtd{color:var(--marrom-suave)}
 .btn-voltar{
   font-family:'Baloo 2',cursive;font-size:1rem;font-weight:700;
   background:var(--creme);color:var(--azul);border:2px solid var(--creme-escuro);

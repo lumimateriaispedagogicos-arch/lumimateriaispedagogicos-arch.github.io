@@ -27,7 +27,8 @@
     "Interpretação de Texto": "📖",
     "Inteligência Emocional": "💛",
     "Coordenação Motora": "✏️",
-    "Datas Especiais": "🎉",
+    "Datas Comemorativas": "🎉",
+    "Temáticos": "🌈",
   };
   const CORES_CATEGORIA = {
     "Consciência Fonológica": "#4A6FA5",
@@ -36,7 +37,19 @@
     "Raciocínio Lógico": "#7D62B8",
     "Interpretação de Texto": "#086B8E",
     "Inteligência Emocional": "#F2B33D",
+    "Datas Comemorativas": "#C0564B",
+    "Temáticos": "#E5A33F",
   };
+
+  // Assuntos que aparecem na home mesmo antes de terem atividades ("Em breve")
+  const CATEGORIAS_FIXAS = [
+    "Matemática",
+    "Raciocínio Lógico",
+    "Interpretação de Texto",
+    "Inteligência Emocional",
+    "Datas Comemorativas",
+    "Temáticos",
+  ];
 
   function cartaoMaterial(m, i) {
     const cor = m.cor || CORES_PADRAO[i % CORES_PADRAO.length];
@@ -77,16 +90,27 @@
     else categorias.push({ nome: c, qtd: 1 });
   });
 
+  // Acrescenta os assuntos fixos que ainda não têm atividade (viram "Em breve")
+  CATEGORIAS_FIXAS.forEach(function (nome) {
+    if (!categorias.find(function (x) { return x.nome === nome; })) {
+      categorias.push({ nome: nome, qtd: 0 });
+    }
+  });
+
   categorias.forEach(function (c, i) {
     const cor = CORES_CATEGORIA[c.nome] || CORES_PADRAO[i % CORES_PADRAO.length];
     const b = document.createElement("button");
-    b.className = "card-categoria";
+    b.className = "card-categoria" + (c.qtd === 0 ? " embreve" : "");
     b.style.setProperty("--cor", cor);
     b.innerHTML =
       '<span class="cat-icone">' + (ICONES[c.nome] || "📚") + "</span>" +
       "<h3>" + c.nome + "</h3>" +
-      '<span class="cat-qtd">' + c.qtd + (c.qtd > 1 ? " atividades" : " atividade") + "</span>";
-    b.addEventListener("click", function () { abrirCategoria(c.nome); });
+      (c.qtd === 0
+        ? '<span class="cat-qtd">🌱 Em breve!</span>'
+        : '<span class="cat-qtd">' + c.qtd + (c.qtd > 1 ? " atividades" : " atividade") + "</span>");
+    if (c.qtd > 0) {
+      b.addEventListener("click", function () { abrirCategoria(c.nome); });
+    }
     gradeCategorias.appendChild(b);
   });
 
