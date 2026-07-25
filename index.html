@@ -59,13 +59,16 @@
   <section id="materiais" class="secao secao-branca">
     <div class="container">
       <h2 class="titulo-secao"><span class="rabisco azul"></span>Materiais para baixar e imprimir</h2>
-      <p class="sub-secao">Clique em <strong>Visualizar</strong> para ver antes, <strong>Baixar</strong> para salvar o PDF ou <strong>Imprimir</strong> para já mandar para a impressora.</p>
+      <p class="sub-secao" id="sub-materiais">Escolha um assunto para ver as atividades. Tudo gratuito: é só <strong>visualizar</strong>, <strong>baixar</strong> ou <strong>imprimir</strong>.</p>
 
-      <div class="filtros" id="filtros" hidden>
-        <button class="filtro ativo" data-cat="todos">Todos</button>
+      <div id="destaques" class="grade-materiais"></div>
+
+      <div id="grade-categorias" class="grade-categorias"></div>
+
+      <div id="visao-categoria" hidden>
+        <button id="btn-voltar" class="btn-voltar">← Voltar aos assuntos</button>
+        <div id="lista-materiais" class="grade-materiais"></div>
       </div>
-
-      <div id="lista-materiais" class="grade-materiais"></div>
 
       <div id="vazio" class="vazio" hidden>
         <p>🖍️ Os primeiros materiais estão chegando! Volte em breve.</p>
