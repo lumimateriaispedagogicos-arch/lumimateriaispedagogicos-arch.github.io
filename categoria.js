@@ -33,7 +33,7 @@
     const outras = doAssunto.filter(function (m) { return m.colecao !== colecao; });
     if (outras.length === 0) {
       voltar.textContent = "← Voltar aos assuntos";
-      voltar.href = "index.html#materiais";
+      voltar.href = "index.html#assuntos";
     } else {
       voltar.textContent = "← Voltar para " + cat;
       voltar.href = "categoria.html?cat=" + encodeURIComponent(cat);
