@@ -31,6 +31,14 @@ CATEGORIAS = [
     ("INTERPRETACAO", ("Interpretação de Texto", "5 a 7 anos")),
     ("EMOCIONAL", ("Inteligência Emocional", "3 a 6 anos")),
     ("COORDENACAO", ("Coordenação Motora", "3 a 6 anos")),
+    ("COLORIR", ("Desenhos para Colorir", "2 a 6 anos")),
+    ("DESENHO", ("Desenhos para Colorir", "2 a 6 anos")),
+    ("NATAL", ("Datas Comemorativas", "3 a 6 anos")),
+    ("PASCOA", ("Datas Comemorativas", "3 a 6 anos")),
+    ("FOLCLORE", ("Datas Comemorativas", "3 a 6 anos")),
+    ("DIA D", ("Datas Comemorativas", "3 a 6 anos")),
+    ("FESTA JUNINA", ("Datas Comemorativas", "3 a 6 anos")),
+    ("TEMATICO", ("Temáticos", "3 a 6 anos")),
 ]
 
 def slug(texto):
