@@ -192,6 +192,9 @@ img{max-width:100%;display:block}
 .acao-baixar:hover{background:var(--azul-escuro)}
 .acao-imprimir{background:var(--branco);color:var(--verde)}
 .acao-imprimir:hover{background:var(--verde);color:#fff}
+.card-simples h3{font-size:1.05rem;text-align:center}
+.card-simples .card-corpo{gap:8px;align-items:center}
+.card-simples .card-acoes{justify-content:center}
 .card-destaque{
   grid-column:1/-1;
   background:linear-gradient(120deg,var(--amarelo-claro),var(--creme));

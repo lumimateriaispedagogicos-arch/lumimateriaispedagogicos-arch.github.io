@@ -44,7 +44,6 @@
   } else {
     // ----- Coleções (subpastas) + materiais avulsos do assunto -----
     tituloPagina(cat);
-    sub.innerHTML = "Escolha uma coleção para ver as atividades — tudo gratuito para baixar e imprimir.";
 
     const colecoes = [];
     doAssunto.forEach(function (m) {
@@ -73,6 +72,10 @@
 
     if (colecoes.length === 0 && avulsos.length === 0) {
       sub.innerHTML = "🌱 As atividades de <strong>" + cat + "</strong> estão chegando! Volte em breve.";
+    } else if (colecoes.length > 0) {
+      sub.innerHTML = "Escolha uma coleção para ver as atividades — tudo gratuito para baixar e imprimir.";
+    } else {
+      sub.innerHTML = "Clique para visualizar, baixar ou imprimir — tudo gratuito!";
     }
   }
 })();

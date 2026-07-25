@@ -44,20 +44,23 @@ function capaDe(m) {
 
 function cartaoMaterial(m, i) {
   const cor = m.cor || CORES_PADRAO[i % CORES_PADRAO.length];
+  // Desenhos para colorir têm card compacto: só prévia, título e botões
+  const simples = m.categoria === "Desenhos para Colorir";
   const meta = [m.idade, m.paginas ? m.paginas + " página" + (m.paginas > 1 ? "s" : "") : null]
     .filter(Boolean).join(" · ");
   const el = document.createElement("article");
-  el.className = "card-material" + (m.destaque ? " card-destaque" : "");
+  el.className = "card-material" + (m.destaque ? " card-destaque" : "") + (simples ? " card-simples" : "");
   el.style.setProperty("--cor", cor);
   el.innerHTML =
     (m.destaque ? '<span class="selo-destaque">⭐ Destaque</span>' : "") +
     '<a class="capa-link" href="' + m.arquivo + '" target="_blank" rel="noopener" title="Visualizar ' + m.titulo + '">' +
     '<img class="capa" src="' + capaDe(m) + '" alt="Prévia: ' + m.titulo + '" loading="lazy"></a>' +
     '<div class="card-corpo">' +
-    '<span class="cat">' + (m.categoria || "Atividade") + "</span>" +
+    (simples ? "" : '<span class="cat">' + (m.categoria || "Atividade") + "</span>") +
     "<h3>" + m.titulo + "</h3>" +
-    '<p class="desc">' + (m.descricao || "") + "</p>" +
-    (meta ? '<p class="meta">' + meta + "</p>" : "") +
+    (simples ? "" :
+      '<p class="desc">' + (m.descricao || "") + "</p>" +
+      (meta ? '<p class="meta">' + meta + "</p>" : "")) +
     '<div class="card-acoes">' +
     '<a class="acao-ver" href="' + m.arquivo + '" target="_blank" rel="noopener">👀 Visualizar</a>' +
     '<a class="acao-baixar" href="' + m.arquivo + '" download>⬇️ Baixar</a>' +
