@@ -12,6 +12,8 @@ const PASTAS_LUMI = Object.freeze([
   { categoria: 'Datas Comemorativas', id: '17FkqrHYUIs80laoonopwvDu1-1mZm_XM' },
   { categoria: 'Temáticos', id: '1onVktRTk-zLn7NIOYAjqVC9UzhC1iay0' }
 ]);
+const CHAVE_CACHE_CATALOGO = 'catalogo-lumi-privado-v3';
+const SEGUNDOS_CACHE_CATALOGO = 60;
 
 function tituloDoArquivo_(nome) {
   const titulo = String(nome || '').replace(/\.pdf$/i, '').replace(/[_-]+/g, ' ')
@@ -66,6 +68,18 @@ function montarCatalogo_() {
   return { sucesso: true, geradoEm: new Date().toISOString(), materiais: materiais, erros: erros };
 }
 
+function catalogoComCache_() {
+  const cache = CacheService.getScriptCache();
+  const salvo = cache.get(CHAVE_CACHE_CATALOGO);
+  if (salvo) {
+    try { return JSON.parse(salvo); }
+    catch (_) { /* Se o cache estiver inválido, reconstrói abaixo. */ }
+  }
+  const catalogo = montarCatalogo_();
+  cache.put(CHAVE_CACHE_CATALOGO, JSON.stringify(catalogo), SEGUNDOS_CACHE_CATALOGO);
+  return catalogo;
+}
+
 /**
  * Procura o ID somente dentro das oito pastas. Deliberadamente não usa
  * DriveApp.getFileById(id), evitando transformar um ID arbitrário em acesso.
@@ -111,7 +125,7 @@ function entregarPdf_(id) {
 function doGet(e) {
   try {
     const parametros = e && e.parameter ? e.parameter : {};
-    return respostaJson_(parametros.action === 'pdf' ? entregarPdf_(parametros.id) : montarCatalogo_());
+    return respostaJson_(parametros.action === 'pdf' ? entregarPdf_(parametros.id) : catalogoComCache_());
   } catch (erro) {
     return respostaJson_({ sucesso: false, codigo: 'ERRO_INTERNO', mensagem: 'Não foi possível atender à solicitação.' });
   }
