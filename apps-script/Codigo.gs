@@ -121,11 +121,30 @@ function entregarPdf_(id) {
   };
 }
 
-/** GET: sem ação lista o catálogo; action=pdf entrega somente um PDF autorizado. */
+function entregarCapa_(id) {
+  const encontrado = localizarPdfAutorizado_(id);
+  if (!encontrado) return { sucesso: false, codigo: 'NAO_AUTORIZADO', mensagem: 'Arquivo não encontrado ou não autorizado.' };
+  const miniatura = encontrado.arquivo.getThumbnail();
+  if (!miniatura) return { sucesso: false, codigo: 'CAPA_INDISPONIVEL', mensagem: 'O Drive ainda não gerou uma prévia para este PDF.' };
+  const mimeType = String(miniatura.getContentType() || '');
+  if (mimeType.indexOf('image/') !== 0) {
+    return { sucesso: false, codigo: 'TIPO_INVALIDO', mensagem: 'A prévia disponível não é uma imagem.' };
+  }
+  return {
+    sucesso: true,
+    id: encontrado.arquivo.getId(),
+    mimeType: mimeType,
+    base64: Utilities.base64Encode(miniatura.getBytes())
+  };
+}
+
+/** GET: sem ação lista; action=pdf entrega PDF; action=capa entrega a miniatura validada. */
 function doGet(e) {
   try {
     const parametros = e && e.parameter ? e.parameter : {};
-    return respostaJson_(parametros.action === 'pdf' ? entregarPdf_(parametros.id) : catalogoComCache_());
+    if (parametros.action === 'pdf') return respostaJson_(entregarPdf_(parametros.id));
+    if (parametros.action === 'capa') return respostaJson_(entregarCapa_(parametros.id));
+    return respostaJson_(catalogoComCache_());
   } catch (erro) {
     return respostaJson_({ sucesso: false, codigo: 'ERRO_INTERNO', mensagem: 'Não foi possível atender à solicitação.' });
   }
