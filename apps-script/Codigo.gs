@@ -117,8 +117,10 @@ function respostaJson_(dados) {
   return ContentService.createTextOutput(JSON.stringify(dados)).setMimeType(ContentService.MimeType.JSON);
 }
 
-function entregarPdf_(id) {
-  const encontrado = localizarPdfAutorizado_(id);
+function entregarPdf_(id, categoria) {
+  // Páginas atuais informam a categoria para consultar somente uma pasta.
+  // A busca ampla preserva compatibilidade com páginas antigas em cache.
+  const encontrado = categoria ? localizarPdfNaCategoria_(id, categoria) : localizarPdfAutorizado_(id);
   if (!encontrado) return { sucesso: false, codigo: 'NAO_AUTORIZADO', mensagem: 'Arquivo não encontrado ou não autorizado.' };
   const blob = encontrado.arquivo.getBlob();
   if (blob.getContentType() !== MimeType.PDF) {
@@ -158,7 +160,7 @@ function entregarCapa_(id, categoria) {
 function doGet(e) {
   try {
     const parametros = e && e.parameter ? e.parameter : {};
-    if (parametros.action === 'pdf') return respostaJson_(entregarPdf_(parametros.id));
+    if (parametros.action === 'pdf') return respostaJson_(entregarPdf_(parametros.id, parametros.categoria));
     if (parametros.action === 'capa') return respostaJson_(entregarCapa_(parametros.id, parametros.categoria));
     return respostaJson_(catalogoComCache_());
   } catch (erro) {
