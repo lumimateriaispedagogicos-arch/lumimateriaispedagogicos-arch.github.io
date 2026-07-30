@@ -45,7 +45,7 @@ function capaDe(m) {
 function carregarCapaRemota(img) {
   if (!img || img.dataset.capaCarregada) return;
   img.dataset.capaCarregada = "1";
-  CatalogoDrive.obterCapa(img.dataset.driveId).then(function (blob) {
+  CatalogoDrive.obterCapa(img.dataset.driveId, img.dataset.categoria, img.dataset.atualizadoEm).then(function (blob) {
     const url = URL.createObjectURL(blob);
     img.addEventListener("load", function () { URL.revokeObjectURL(url); }, { once: true });
     img.src = url;
@@ -111,6 +111,8 @@ function cartaoMaterial(m, i) {
   if (m.remoto) {
     const capa = el.querySelector("img.capa");
     capa.dataset.driveId = m.driveId;
+    capa.dataset.categoria = m.categoria;
+    capa.dataset.atualizadoEm = m.atualizadoEm || "";
     observarCapaRemota(capa);
   }
   return el;
