@@ -142,12 +142,33 @@ document.addEventListener("click", function (e) {
   }, 4000);
 });
 
+function prepararJanelaDeEspera(janela) {
+  if (!janela) return;
+  janela.document.open();
+  janela.document.write(
+    '<!doctype html><html lang="pt-BR"><head><meta charset="utf-8">' +
+    '<meta name="viewport" content="width=device-width,initial-scale=1">' +
+    '<title>Preparando material — LUMI</title><style>' +
+    'body{margin:0;min-height:100vh;display:grid;place-items:center;background:#fffaf0;color:#5b3b23;font-family:Nunito,Arial,sans-serif}' +
+    '.box{text-align:center;padding:32px;max-width:520px}.marca{font-size:48px;font-weight:900;color:#4a6fa5;letter-spacing:2px}' +
+    'h1{font-size:25px;margin:18px 0 8px}.texto{font-size:17px;line-height:1.5;color:#806b59}' +
+    '.giro{width:46px;height:46px;margin:25px auto;border:6px solid #f2dfbd;border-top-color:#f2b33d;border-radius:50%;animation:g 1s linear infinite}' +
+    '@keyframes g{to{transform:rotate(360deg)}}.nota{font-size:14px;color:#9a8777}</style></head>' +
+    '<body><main class="box"><div class="marca">LUMI</div><div class="giro" aria-label="Carregando"></div>' +
+    '<h1>Estamos preparando seu material</h1>' +
+    '<p class="texto">O arquivo está sendo carregado com segurança. Ele abrirá automaticamente assim que estiver pronto.</p>' +
+    '<p class="nota">Por favor, não feche esta aba.</p></main></body></html>'
+  );
+  janela.document.close();
+}
+
 // PDFs privados são recebidos pelo Apps Script e transformados em Blob local.
 document.addEventListener("click", async function (e) {
   const btn = e.target.closest(".acao-pdf-remoto");
   if (!btn || btn.disabled) return;
   const acao = btn.dataset.acao;
   const janela = acao === "visualizar" ? window.open("", "_blank") : null;
+  if (janela) prepararJanelaDeEspera(janela);
   const rotuloOriginal = btn.innerHTML;
   const rotulosEspera = { visualizar: "⏳ Abrindo…", baixar: "⏳ Baixando…", imprimir: "⏳ Preparando…" };
   btn.disabled = true;
