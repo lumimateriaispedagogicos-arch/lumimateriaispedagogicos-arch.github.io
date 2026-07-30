@@ -112,12 +112,13 @@
     for (let i = 0; i < binario.length; i++) bytes[i] = binario.charCodeAt(i);
     return new Blob([bytes], { type: mimeType });
   }
-  async function obterPdf(id) {
+  async function obterPdf(id, categoria) {
     const config = configAtual();
     if (!texto(config.endpoint)) throw new Error("A integração com o Drive ainda não foi configurada.");
     if (!/^[A-Za-z0-9_-]{10,200}$/.test(texto(id))) throw new Error("Identificador de material inválido.");
     const url = new URL(config.endpoint);
     url.searchParams.set("action", "pdf"); url.searchParams.set("id", id);
+    url.searchParams.set("categoria", texto(categoria));
     const resposta = await requisitarJson(url.toString(), config);
     if (!resposta || resposta.sucesso !== true || resposta.id !== id || resposta.mimeType !== "application/pdf" || !texto(resposta.base64)) {
       throw new Error((resposta && resposta.mensagem) || "O PDF não pôde ser obtido.");
