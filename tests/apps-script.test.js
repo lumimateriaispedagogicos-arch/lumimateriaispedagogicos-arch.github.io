@@ -24,6 +24,15 @@ porPasta[IDs[0]] = [permitido, naoPdf, doisPais];
 
 const contexto = vm.createContext({
   MimeType: { PDF: "application/pdf" },
+  CacheService: {
+    getScriptCache: () => {
+      const memoria = new Map();
+      return {
+        get: (chave) => memoria.get(chave) || null,
+        put: (chave, valor) => memoria.set(chave, valor)
+      };
+    }
+  },
   DriveApp: {
     getFolderById: (id) => ({ getFilesByType: () => iterador(porPasta[id] || []) }),
     getFileById: () => { throw new Error("getFileById nunca deve ser usado"); }
