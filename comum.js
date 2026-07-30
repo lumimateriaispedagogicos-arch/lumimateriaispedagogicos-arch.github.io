@@ -89,7 +89,7 @@ function cartaoMaterial(m, i) {
   el.innerHTML =
     (m.destaque ? '<span class="selo-destaque">⭐ Destaque</span>' : "") +
     (m.remoto
-      ? '<button class="capa-link capa-link-botao acao-pdf-remoto" type="button" data-acao="visualizar" data-drive-id="' + escaparHtml(m.driveId) + '" title="Visualizar ' + titulo + '">'
+      ? '<button class="capa-link capa-link-botao acao-pdf-remoto" type="button" data-acao="visualizar" data-drive-id="' + escaparHtml(m.driveId) + '" data-categoria="' + escaparHtml(m.categoria) + '" title="Visualizar ' + titulo + '">'
       : '<a class="capa-link" href="' + arquivo + '" target="_blank" rel="noopener" title="Visualizar ' + titulo + '">') +
     '<img class="capa" src="' + escaparHtml(capaDe(m)) + '" alt="Prévia: ' + titulo + '" loading="lazy" data-capa-padrao="img/capas/capa-padrao.svg">' +
     (m.remoto ? "</button>" : "</a>") +
@@ -101,9 +101,9 @@ function cartaoMaterial(m, i) {
       (meta ? '<p class="meta">' + meta + "</p>" : "")) +
     '<div class="card-acoes">' +
     (m.remoto
-      ? '<button class="acao-ver acao-pdf-remoto" data-acao="visualizar" data-drive-id="' + escaparHtml(m.driveId) + '">👀 Visualizar</button>' +
-        '<button class="acao-baixar acao-pdf-remoto" data-acao="baixar" data-drive-id="' + escaparHtml(m.driveId) + '">⬇️ Baixar</button>' +
-        '<button class="acao-imprimir acao-pdf-remoto" data-acao="imprimir" data-drive-id="' + escaparHtml(m.driveId) + '">🖨️ Imprimir</button>'
+      ? '<button type="button" class="acao-ver acao-pdf-remoto" data-acao="visualizar" data-drive-id="' + escaparHtml(m.driveId) + '" data-categoria="' + escaparHtml(m.categoria) + '">👀 Visualizar</button>' +
+        '<button type="button" class="acao-baixar acao-pdf-remoto" data-acao="baixar" data-drive-id="' + escaparHtml(m.driveId) + '" data-categoria="' + escaparHtml(m.categoria) + '">⬇️ Baixar</button>' +
+        '<button type="button" class="acao-imprimir acao-pdf-remoto" data-acao="imprimir" data-drive-id="' + escaparHtml(m.driveId) + '" data-categoria="' + escaparHtml(m.categoria) + '">🖨️ Imprimir</button>'
       : '<a class="acao-ver" href="' + arquivo + '" target="_blank" rel="noopener">👀 Visualizar</a>' +
         '<a class="acao-baixar" href="' + arquivo + '" download>⬇️ Baixar</a>' +
         '<button class="acao-imprimir" data-pdf="' + arquivo + '">🖨️ Imprimir</button>') +
@@ -148,9 +148,12 @@ document.addEventListener("click", async function (e) {
   if (!btn || btn.disabled) return;
   const acao = btn.dataset.acao;
   const janela = acao === "visualizar" ? window.open("", "_blank") : null;
+  const rotuloOriginal = btn.innerHTML;
+  const rotulosEspera = { visualizar: "⏳ Abrindo…", baixar: "⏳ Baixando…", imprimir: "⏳ Preparando…" };
   btn.disabled = true;
+  btn.innerHTML = rotulosEspera[acao] || "⏳ Aguarde…";
   try {
-    const pdf = await CatalogoDrive.obterPdf(btn.dataset.driveId);
+    const pdf = await CatalogoDrive.obterPdf(btn.dataset.driveId, btn.dataset.categoria);
     const url = URL.createObjectURL(pdf.blob);
     if (acao === "baixar") {
       const link = document.createElement("a");
@@ -168,7 +171,10 @@ document.addEventListener("click", async function (e) {
     if (janela) janela.close();
     alert("Não foi possível abrir este material agora. Tente novamente em instantes.");
     console.warn("LUMI: falha ao obter PDF privado.", erro);
-  } finally { btn.disabled = false; }
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = rotuloOriginal;
+  }
 });
 
 function imprimirPdf(url, concluir) {

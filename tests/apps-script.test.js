@@ -57,6 +57,14 @@ assert.equal(contexto.localizarPdfAutorizado_("arquivoForaDaLista12"), null);
 const respostaPermitida = JSON.parse(contexto.doGet({ parameter: { action: "pdf", id: "arquivoPermitido123" } }).texto);
 assert.equal(respostaPermitida.sucesso, true);
 assert.equal(respostaPermitida.mimeType, "application/pdf");
+const pdfComCategoria = JSON.parse(contexto.doGet({ parameter: {
+  action: "pdf", id: "arquivoPermitido123", categoria: "Consciência Fonológica"
+} }).texto);
+assert.equal(pdfComCategoria.sucesso, true);
+const pdfCategoriaErrada = JSON.parse(contexto.doGet({ parameter: {
+  action: "pdf", id: "arquivoPermitido123", categoria: "Matemática"
+} }).texto);
+assert.equal(pdfCategoriaErrada.codigo, "NAO_AUTORIZADO");
 assert.equal(respostaPermitida.base64, "JVBERg==");
 const capaPermitida = JSON.parse(contexto.doGet({ parameter: { action: "capa", id: "arquivoPermitido123" } }).texto);
 assert.equal(capaPermitida.sucesso, true);
