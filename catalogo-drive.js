@@ -96,7 +96,10 @@
   }
   async function carregar(locais) {
     const config = configAtual();
-    let remotos = lerCache(config, false);
+    // Mantém o último catálogo conhecido, mesmo expirado, até que uma
+    // resposta nova e válida esteja disponível. Assim uma falha temporária
+    // do Apps Script nunca faz categorias já publicadas voltarem a "Em breve".
+    let remotos = lerCache(config, true);
     try { remotos = await buscar(config); }
     catch (erro) { console.warn("LUMI: catálogo remoto indisponível; usando catálogo local/cache.", erro); }
     return mesclar(Array.isArray(locais) ? locais : [], remotos);
