@@ -8,19 +8,22 @@ const IDs = ["1FkePrTiuFTPPBNZW_DpC6BZNE0LtFUfu", "1jECY4J5vAsU1P7XTBNf4LG4ktg-Q
   "17FkqrHYUIs80laoonopwvDu1-1mZm_XM", "1onVktRTk-zLn7NIOYAjqVC9UzhC1iay0"];
 
 function iterador(itens) { let i = 0; return { hasNext: () => i < itens.length, next: () => itens[i++] }; }
-function arquivo(id, tipo, pais) {
+function arquivo(id, tipo, pais, temMiniatura = true) {
   return { getId: () => id, getName: () => id + ".pdf", getMimeType: () => tipo,
     getParents: () => iterador(pais.map((p) => ({ getId: () => p }))),
     getLastUpdated: () => new Date("2026-07-30T00:00:00Z"),
+    getThumbnail: () => temMiniatura ? ({ getContentType: () => "image/png", getBytes: () => [137, 80, 78, 71] }) : null,
     getBlob: () => ({ getContentType: () => tipo, getBytes: () => [37, 80, 68, 70] }) };
 }
 
 const permitido = arquivo("arquivoPermitido123", "application/pdf", [IDs[0]]);
+const semCapa = arquivo("arquivoSemMiniatura1", "application/pdf", [IDs[1]], false);
 const outraPasta = arquivo("arquivoForaDaLista12", "application/pdf", ["pastaNaoAutorizada"]);
 const naoPdf = arquivo("arquivoTextoPrivado1", "text/plain", [IDs[0]]);
 const doisPais = arquivo("arquivoComDoisPais1", "application/pdf", [IDs[0], "outraPasta"]);
 const porPasta = Object.fromEntries(IDs.map((id) => [id, []]));
 porPasta[IDs[0]] = [permitido, naoPdf, doisPais];
+porPasta[IDs[1]] = [semCapa];
 
 const contexto = vm.createContext({
   MimeType: { PDF: "application/pdf" },
@@ -55,13 +58,21 @@ const respostaPermitida = JSON.parse(contexto.doGet({ parameter: { action: "pdf"
 assert.equal(respostaPermitida.sucesso, true);
 assert.equal(respostaPermitida.mimeType, "application/pdf");
 assert.equal(respostaPermitida.base64, "JVBERg==");
+const capaPermitida = JSON.parse(contexto.doGet({ parameter: { action: "capa", id: "arquivoPermitido123" } }).texto);
+assert.equal(capaPermitida.sucesso, true);
+assert.equal(capaPermitida.mimeType, "image/png");
+assert.equal(capaPermitida.base64, "iVBORw==");
 const respostaNegada = JSON.parse(contexto.doGet({ parameter: { action: "pdf", id: "arquivoForaDaLista12" } }).texto);
 assert.equal(respostaNegada.sucesso, false);
 assert.equal(respostaNegada.codigo, "NAO_AUTORIZADO");
+const capaNegada = JSON.parse(contexto.doGet({ parameter: { action: "capa", id: "arquivoForaDaLista12" } }).texto);
+assert.equal(capaNegada.codigo, "NAO_AUTORIZADO");
+const capaIndisponivel = JSON.parse(contexto.doGet({ parameter: { action: "capa", id: "arquivoSemMiniatura1" } }).texto);
+assert.equal(capaIndisponivel.codigo, "CAPA_INDISPONIVEL");
 const respostaNaoPdf = JSON.parse(contexto.doGet({ parameter: { action: "pdf", id: "arquivoTextoPrivado1" } }).texto);
 assert.equal(respostaNaoPdf.sucesso, false);
 assert.equal(respostaNaoPdf.codigo, "NAO_AUTORIZADO");
 const catalogo = JSON.parse(contexto.doGet({ parameter: {} }).texto);
-assert.equal(catalogo.materiais.length, 1);
+assert.equal(catalogo.materiais.length, 2);
 assert.deepEqual(Object.keys(catalogo.materiais[0]).sort(), ["atualizadoEm", "categoria", "id", "titulo"]);
 console.log("Todos os testes de segurança do Apps Script passaram.");
