@@ -1,7 +1,7 @@
 // Configuração pública da integração com o Google Drive.
 // Cole somente a URL pública terminada em /exec. Nunca coloque credenciais aqui.
 window.LUMI_DRIVE_CONFIG = Object.freeze({
-  endpoint: "",
+  endpoint: "https://script.google.com/macros/s/AKfycbzpay84vPDuwm9SNVZnrcSOYIchu9dyhUKFM_XBlNJXYcyE1VJES-WFkpOqSn4p8pC3TQ/exec",
   timeoutMs: 8000,
   cacheMs: 30 * 60 * 1000,
   categorias: Object.freeze([
