@@ -3,6 +3,7 @@
 
   const CACHE_KEY = "lumi.catalogoDrive.v2";
   const CORES = ["#4A6FA5", "#D96A5A", "#7C9A6D", "#7D62B8", "#086B8E", "#F2B33D", "#C0564B", "#E5A33F"];
+  const capasEmMemoria = new Map();
   function texto(valor) { return typeof valor === "string" ? valor.trim() : ""; }
   function normalizar(valor) {
     return texto(valor).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase()
@@ -123,8 +124,29 @@
     return { blob: base64ParaBlob(resposta.base64, resposta.mimeType), nome: texto(resposta.nome) || "material-lumi.pdf" };
   }
 
+  function obterCapa(id) {
+    const identificador = texto(id);
+    if (capasEmMemoria.has(identificador)) return capasEmMemoria.get(identificador);
+    const promessa = (async function () {
+      const config = configAtual();
+      if (!texto(config.endpoint)) throw new Error("A integração com o Drive ainda não foi configurada.");
+      if (!/^[A-Za-z0-9_-]{10,200}$/.test(identificador)) throw new Error("Identificador de material inválido.");
+      const url = new URL(config.endpoint);
+      url.searchParams.set("action", "capa"); url.searchParams.set("id", identificador);
+      const resposta = await requisitarJson(url.toString(), config);
+      if (!resposta || resposta.sucesso !== true || resposta.id !== identificador ||
+          !/^image\//.test(texto(resposta.mimeType)) || !texto(resposta.base64)) {
+        throw new Error((resposta && resposta.mensagem) || "A capa não pôde ser obtida.");
+      }
+      return base64ParaBlob(resposta.base64, resposta.mimeType);
+    })();
+    capasEmMemoria.set(identificador, promessa);
+    promessa.catch(function () { capasEmMemoria.delete(identificador); });
+    return promessa;
+  }
+
   window.CatalogoDrive = {
-    carregar: carregar, carregarCache: carregarCache, obterPdf: obterPdf,
+    carregar: carregar, carregarCache: carregarCache, obterPdf: obterPdf, obterCapa: obterCapa,
     mesclar: mesclar, tituloDoNome: tituloDoNome, converter: converter
   };
 })();

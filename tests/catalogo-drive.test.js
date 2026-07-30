@@ -28,6 +28,9 @@ function item(sobrescrever = {}) {
   const requisicoes = [];
   const valido = ambiente(async (url) => {
     requisicoes.push(String(url));
+    if (String(url).includes("action=capa")) return { ok: true, json: async () => ({
+      sucesso: true, id: "arquivoPermitido123", mimeType: "image/png", base64: "iVBORw=="
+    }) };
     if (String(url).includes("action=pdf")) return { ok: true, json: async () => ({
       sucesso: true, id: "arquivoPermitido123", nome: "Atividade.pdf", mimeType: "application/pdf", base64: "JVBERi0="
     }) };
@@ -48,6 +51,14 @@ function item(sobrescrever = {}) {
   assert.equal(pdf.blob.size, 5);
   assert.match(requisicoes.at(-1), /action=pdf/);
   assert.match(requisicoes.at(-1), /id=arquivoPermitido123/);
+
+  const capa = await valido.CatalogoDrive.obterCapa("arquivoPermitido123");
+  assert.equal(capa.type, "image/png");
+  assert.equal(capa.size, 4);
+  assert.match(requisicoes.at(-1), /action=capa/);
+  const quantidadeAntesDoCache = requisicoes.length;
+  await valido.CatalogoDrive.obterCapa("arquivoPermitido123");
+  assert.equal(requisicoes.length, quantidadeAntesDoCache);
 
   const negado = ambiente(async () => ({ ok: true, json: async () => ({
     sucesso: false, codigo: "NAO_AUTORIZADO", mensagem: "Arquivo não autorizado."

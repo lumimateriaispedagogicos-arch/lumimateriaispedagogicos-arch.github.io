@@ -42,6 +42,33 @@ function capaDe(m) {
   return m.remoto ? "img/capas/capa-padrao.svg" : (m.capa || m.arquivo.replace("materiais/", "img/capas/").replace(".pdf", ".jpg"));
 }
 
+function carregarCapaRemota(img) {
+  if (!img || img.dataset.capaCarregada) return;
+  img.dataset.capaCarregada = "1";
+  CatalogoDrive.obterCapa(img.dataset.driveId).then(function (blob) {
+    const url = URL.createObjectURL(blob);
+    img.addEventListener("load", function () { URL.revokeObjectURL(url); }, { once: true });
+    img.src = url;
+  }).catch(function () {
+    // O Drive nem sempre gera miniatura. Nesse caso, a capa padrão permanece.
+  });
+}
+
+const observadorCapas = typeof IntersectionObserver === "function"
+  ? new IntersectionObserver(function (entradas) {
+      entradas.forEach(function (entrada) {
+        if (!entrada.isIntersecting) return;
+        observadorCapas.unobserve(entrada.target);
+        carregarCapaRemota(entrada.target);
+      });
+    }, { rootMargin: "200px" })
+  : null;
+
+function observarCapaRemota(img) {
+  if (observadorCapas) observadorCapas.observe(img);
+  else carregarCapaRemota(img);
+}
+
 function escaparHtml(valor) {
   return String(valor || "").replace(/[&<>"']/g, function (caractere) {
     return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[caractere];
@@ -81,6 +108,11 @@ function cartaoMaterial(m, i) {
         '<a class="acao-baixar" href="' + arquivo + '" download>⬇️ Baixar</a>' +
         '<button class="acao-imprimir" data-pdf="' + arquivo + '">🖨️ Imprimir</button>') +
     "</div></div>";
+  if (m.remoto) {
+    const capa = el.querySelector("img.capa");
+    capa.dataset.driveId = m.driveId;
+    observarCapaRemota(capa);
+  }
   return el;
 }
 
