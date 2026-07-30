@@ -99,6 +99,20 @@ function localizarPdfAutorizado_(id) {
   return null;
 }
 
+function localizarPdfNaCategoria_(id, categoria) {
+  if (!/^[A-Za-z0-9_-]{10,200}$/.test(String(id || ''))) return null;
+  const pasta = PASTAS_LUMI.find(function (item) { return item.categoria === String(categoria || ''); });
+  if (!pasta) return null;
+  const arquivos = DriveApp.getFolderById(pasta.id).getFilesByType(MimeType.PDF);
+  while (arquivos.hasNext()) {
+    const arquivo = arquivos.next();
+    if (arquivo.getId() === id && pastaUnicaAutorizada_(arquivo, pasta.id)) {
+      return { arquivo: arquivo, pasta: pasta };
+    }
+  }
+  return null;
+}
+
 function respostaJson_(dados) {
   return ContentService.createTextOutput(JSON.stringify(dados)).setMimeType(ContentService.MimeType.JSON);
 }
@@ -121,8 +135,10 @@ function entregarPdf_(id) {
   };
 }
 
-function entregarCapa_(id) {
-  const encontrado = localizarPdfAutorizado_(id);
+function entregarCapa_(id, categoria) {
+  // A categoria permite consultar somente uma pasta. Mantemos a busca ampla
+  // como compatibilidade temporária para páginas antigas ainda em cache.
+  const encontrado = categoria ? localizarPdfNaCategoria_(id, categoria) : localizarPdfAutorizado_(id);
   if (!encontrado) return { sucesso: false, codigo: 'NAO_AUTORIZADO', mensagem: 'Arquivo não encontrado ou não autorizado.' };
   const miniatura = encontrado.arquivo.getThumbnail();
   if (!miniatura) return { sucesso: false, codigo: 'CAPA_INDISPONIVEL', mensagem: 'O Drive ainda não gerou uma prévia para este PDF.' };
@@ -143,7 +159,7 @@ function doGet(e) {
   try {
     const parametros = e && e.parameter ? e.parameter : {};
     if (parametros.action === 'pdf') return respostaJson_(entregarPdf_(parametros.id));
-    if (parametros.action === 'capa') return respostaJson_(entregarCapa_(parametros.id));
+    if (parametros.action === 'capa') return respostaJson_(entregarCapa_(parametros.id, parametros.categoria));
     return respostaJson_(catalogoComCache_());
   } catch (erro) {
     return respostaJson_({ sucesso: false, codigo: 'ERRO_INTERNO', mensagem: 'Não foi possível atender à solicitação.' });
