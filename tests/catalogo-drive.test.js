@@ -70,6 +70,19 @@ function item(sobrescrever = {}) {
     assert.equal((await app.CatalogoDrive.carregar([{ titulo: "Local" }])).length, 1);
   }
 
+  let redeDisponivel = true;
+  const cacheExpirado = ambiente(async () => {
+    if (!redeDisponivel) throw new Error("rede indisponível");
+    return { ok: true, json: async () => ({ sucesso: true, materiais: [item()] }) };
+  });
+  cacheExpirado.LUMI_DRIVE_CONFIG = Object.assign({}, cacheExpirado.LUMI_DRIVE_CONFIG, {
+    endpoint: "https://example.test/exec",
+    cacheMs: -1
+  });
+  assert.equal((await cacheExpirado.CatalogoDrive.carregar([{ titulo: "Local" }])).length, 2);
+  redeDisponivel = false;
+  assert.equal((await cacheExpirado.CatalogoDrive.carregar([{ titulo: "Local" }])).length, 2);
+
   valido.LUMI_DRIVE_CONFIG.categorias.forEach((categoria, indice) => {
     assert.ok(valido.CatalogoDrive.converter(item({ id: "arquivoPermitido" + indice, categoria: categoria.nome }), indice, valido.LUMI_DRIVE_CONFIG));
   });
