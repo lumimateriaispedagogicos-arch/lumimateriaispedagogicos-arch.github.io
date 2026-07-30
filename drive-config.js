@@ -3,7 +3,9 @@
 window.LUMI_DRIVE_CONFIG = Object.freeze({
   endpoint: "https://script.google.com/macros/s/AKfycbzpay84vPDuwm9SNVZnrcSOYIchu9dyhUKFM_XBlNJXYcyE1VJES-WFkpOqSn4p8pC3TQ/exec",
   timeoutMs: 8000,
-  cacheMs: 30 * 60 * 1000,
+  // Cache válido para contingência. A consulta ao Drive continua sendo feita
+  // em toda visita e substitui o cache assim que termina.
+  cacheMs: 5 * 60 * 1000,
   categorias: Object.freeze([
     { nome: "Consciência Fonológica", pastaId: "1FkePrTiuFTPPBNZW_DpC6BZNE0LtFUfu" },
     { nome: "Desenhos para Colorir", pastaId: "1jECY4J5vAsU1P7XTBNf4LG4ktg-QFUEf" },
