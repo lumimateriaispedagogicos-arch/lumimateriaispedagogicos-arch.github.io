@@ -1,7 +1,7 @@
 // Página de assunto/coleção (categoria.html).
 // ?cat=Assunto            → mostra as coleções (subpastas) e materiais avulsos
 // ?cat=Assunto&colecao=X  → mostra os PDFs da coleção X
-(function () {
+(async function () {
   const params = new URLSearchParams(location.search);
   const cat = params.get("cat");
   const colecao = params.get("colecao");
@@ -13,17 +13,19 @@
 
   if (!cat) { location.href = "index.html#materiais"; return; }
 
-  const cor = CORES_CATEGORIA[cat] || "#4A6FA5";
-  const icone = ICONES_CATEGORIA[cat] || "📚";
-  const doAssunto = MATERIAIS.filter(function (m) {
-    return !m.destaque && (m.categoria || "Outros") === cat;
-  });
-
   function tituloPagina(texto) {
+    const cor = CORES_CATEGORIA[cat] || "#4A6FA5";
+    const icone = ICONES_CATEGORIA[cat] || "📚";
     titulo.innerHTML = '<span class="rabisco" style="background:' + cor + '"></span>' + icone + " " + texto;
     document.title = texto + " — LUMI Materiais Pedagógicos";
   }
 
+  function renderizar(materiais) {
+    lista.replaceChildren();
+    const cor = CORES_CATEGORIA[cat] || "#4A6FA5";
+    const doAssunto = materiais.filter(function (m) {
+      return !m.destaque && (m.categoria || "Outros") === cat;
+    });
   if (colecao) {
     // ----- PDFs de uma coleção -----
     tituloPagina(colecao);
@@ -78,4 +80,8 @@
       sub.innerHTML = "Clique para visualizar, baixar ou imprimir — tudo gratuito!";
     }
   }
+  }
+
+  renderizar(MATERIAIS);
+  renderizar(await CatalogoDrive.carregar(MATERIAIS));
 })();
