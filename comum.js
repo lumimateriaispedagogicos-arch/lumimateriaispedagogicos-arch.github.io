@@ -39,7 +39,13 @@ const CATEGORIAS_FIXAS = [
 ];
 
 function capaDe(m) {
-  return m.capa || m.arquivo.replace("materiais/", "img/capas/").replace(".pdf", ".jpg");
+  return m.capa || (m.remoto ? "img/capas/capa-padrao.svg" : m.arquivo.replace("materiais/", "img/capas/").replace(".pdf", ".jpg"));
+}
+
+function escaparHtml(valor) {
+  return String(valor || "").replace(/[&<>"']/g, function (caractere) {
+    return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[caractere];
+  });
 }
 
 function cartaoMaterial(m, i) {
@@ -49,22 +55,25 @@ function cartaoMaterial(m, i) {
   const meta = [m.idade, m.paginas ? m.paginas + " página" + (m.paginas > 1 ? "s" : "") : null]
     .filter(Boolean).join(" · ");
   const el = document.createElement("article");
+  const arquivo = escaparHtml(m.arquivo);
+  const download = escaparHtml(m.download || m.arquivo);
+  const titulo = escaparHtml(m.titulo);
   el.className = "card-material" + (m.destaque ? " card-destaque" : "") + (simples ? " card-simples" : "");
   el.style.setProperty("--cor", cor);
   el.innerHTML =
     (m.destaque ? '<span class="selo-destaque">⭐ Destaque</span>' : "") +
-    '<a class="capa-link" href="' + m.arquivo + '" target="_blank" rel="noopener" title="Visualizar ' + m.titulo + '">' +
-    '<img class="capa" src="' + capaDe(m) + '" alt="Prévia: ' + m.titulo + '" loading="lazy"></a>' +
+    '<a class="capa-link" href="' + arquivo + '" target="_blank" rel="noopener" title="Visualizar ' + titulo + '">' +
+    '<img class="capa" src="' + escaparHtml(capaDe(m)) + '" alt="Prévia: ' + titulo + '" loading="lazy" data-capa-padrao="img/capas/capa-padrao.svg"></a>' +
     '<div class="card-corpo">' +
-    (simples ? "" : '<span class="cat">' + (m.categoria || "Atividade") + "</span>") +
-    "<h3>" + m.titulo + "</h3>" +
+    (simples ? "" : '<span class="cat">' + escaparHtml(m.categoria || "Atividade") + "</span>") +
+    "<h3>" + titulo + "</h3>" +
     (simples ? "" :
-      '<p class="desc">' + (m.descricao || "") + "</p>" +
+      '<p class="desc">' + escaparHtml(m.descricao || "") + "</p>" +
       (meta ? '<p class="meta">' + meta + "</p>" : "")) +
     '<div class="card-acoes">' +
-    '<a class="acao-ver" href="' + m.arquivo + '" target="_blank" rel="noopener">👀 Visualizar</a>' +
-    '<a class="acao-baixar" href="' + m.arquivo + '" download>⬇️ Baixar</a>' +
-    '<button class="acao-imprimir" data-pdf="' + m.arquivo + '">🖨️ Imprimir</button>' +
+    '<a class="acao-ver" href="' + arquivo + '" target="_blank" rel="noopener">👀 Visualizar</a>' +
+    '<a class="acao-baixar" href="' + download + '" target="_blank" rel="noopener" download>⬇️ Baixar</a>' +
+    '<button class="acao-imprimir" data-pdf="' + arquivo + '">🖨️ Imprimir</button>' +
     "</div></div>";
   return el;
 }
@@ -92,6 +101,13 @@ document.addEventListener("click", function (e) {
     if (!frame.dataset.ok) window.open(url, "_blank");
   }, 4000);
 });
+
+document.addEventListener("error", function (e) {
+  if (e.target.matches && e.target.matches("img[data-capa-padrao]") && !e.target.dataset.usandoPadrao) {
+    e.target.dataset.usandoPadrao = "1";
+    e.target.src = e.target.dataset.capaPadrao;
+  }
+}, true);
 
 // Rodapé: ano atual
 (function () {

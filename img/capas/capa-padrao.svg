@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 679" role="img" aria-labelledby="titulo descricao">
+  <title id="titulo">Capa padrão LUMI</title><desc id="descricao">Capa creme com formas coloridas e o nome LUMI.</desc>
+  <rect width="480" height="679" rx="28" fill="#FBF4E7"/><circle cx="70" cy="80" r="36" fill="#F2B33D"/>
+  <path d="M390 0h90v130l-90-35z" fill="#7C9A6D"/><path d="M0 565l130 45-55 69H0z" fill="#D96A5A"/>
+  <rect x="52" y="185" width="376" height="265" rx="28" fill="#fff" stroke="#F3E8D3" stroke-width="8"/>
+  <text x="240" y="300" text-anchor="middle" font-family="system-ui,sans-serif" font-size="72" font-weight="800" fill="#4A6FA5">LUMI</text>
+  <text x="240" y="355" text-anchor="middle" font-family="system-ui,sans-serif" font-size="24" font-weight="700" fill="#5C4632">Material pedagógico</text>
+  <text x="240" y="397" text-anchor="middle" font-family="system-ui,sans-serif" font-size="21" fill="#8A7460">gratuito para aprender brincando</text>
+</svg>
