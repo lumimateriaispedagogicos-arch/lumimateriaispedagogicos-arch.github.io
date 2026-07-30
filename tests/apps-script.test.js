@@ -62,6 +62,14 @@ const capaPermitida = JSON.parse(contexto.doGet({ parameter: { action: "capa", i
 assert.equal(capaPermitida.sucesso, true);
 assert.equal(capaPermitida.mimeType, "image/png");
 assert.equal(capaPermitida.base64, "iVBORw==");
+const capaComCategoria = JSON.parse(contexto.doGet({ parameter: {
+  action: "capa", id: "arquivoPermitido123", categoria: "Consciência Fonológica"
+} }).texto);
+assert.equal(capaComCategoria.sucesso, true);
+const capaCategoriaErrada = JSON.parse(contexto.doGet({ parameter: {
+  action: "capa", id: "arquivoPermitido123", categoria: "Matemática"
+} }).texto);
+assert.equal(capaCategoriaErrada.codigo, "NAO_AUTORIZADO");
 const respostaNegada = JSON.parse(contexto.doGet({ parameter: { action: "pdf", id: "arquivoForaDaLista12" } }).texto);
 assert.equal(respostaNegada.sucesso, false);
 assert.equal(respostaNegada.codigo, "NAO_AUTORIZADO");
