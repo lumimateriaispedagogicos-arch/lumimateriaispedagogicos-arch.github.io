@@ -170,6 +170,7 @@ img{max-width:100%;display:block}
 .card-material:hover{transform:translateY(-4px)}
 .card-corpo{display:flex;flex-direction:column;gap:10px;flex:1}
 .capa-link{display:block;border-radius:14px;overflow:hidden;box-shadow:0 3px 12px rgba(92,70,50,.14)}
+.capa-link-botao{width:100%;padding:0;border:0;background:transparent;cursor:pointer;text-align:inherit}
 .capa{width:100%;aspect-ratio:480/679;object-fit:cover;object-position:top;transition:.25s}
 .capa-link:hover .capa{transform:scale(1.03)}
 .card-material .cat{
