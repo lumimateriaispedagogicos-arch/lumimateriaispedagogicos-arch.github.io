@@ -4,10 +4,21 @@ const vm = require("node:vm");
 
 function ambiente(fetchImpl) {
   const memoria = new Map();
-  const window = {};
+  const respostasCache = new Map();
+  const window = {
+    location: { origin: "https://lumi.test" },
+    caches: {
+      open: async () => ({
+        match: async (chave) => respostasCache.get(String(chave)) || null,
+        put: async (chave, resposta) => respostasCache.set(String(chave), resposta.clone()),
+        keys: async () => Array.from(respostasCache.keys()).map((url) => ({ url })),
+        delete: async (chave) => respostasCache.delete(typeof chave === "string" ? chave : chave.url)
+      })
+    }
+  };
   const contexto = vm.createContext({
     window, console: { warn() {} }, fetch: fetchImpl, AbortController, setTimeout, clearTimeout,
-    URL, Blob, Uint8Array, atob,
+    URL, Blob, Response, Uint8Array, atob,
     localStorage: { getItem: (k) => memoria.get(k) || null, setItem: (k, v) => memoria.set(k, v) }
   });
   ["drive-config.js", "catalogo-drive.js"].forEach((arquivo) =>
@@ -52,12 +63,13 @@ function item(sobrescrever = {}) {
   assert.match(requisicoes.at(-1), /action=pdf/);
   assert.match(requisicoes.at(-1), /id=arquivoPermitido123/);
 
-  const capa = await valido.CatalogoDrive.obterCapa("arquivoPermitido123");
+  const capa = await valido.CatalogoDrive.obterCapa("arquivoPermitido123", "Matemática", "2026-07-30T00:00:00.000Z");
   assert.equal(capa.type, "image/png");
   assert.equal(capa.size, 4);
   assert.match(requisicoes.at(-1), /action=capa/);
+  assert.match(requisicoes.at(-1), /categoria=Matem%C3%A1tica/);
   const quantidadeAntesDoCache = requisicoes.length;
-  await valido.CatalogoDrive.obterCapa("arquivoPermitido123");
+  await valido.CatalogoDrive.obterCapa("arquivoPermitido123", "Matemática", "2026-07-30T00:00:00.000Z");
   assert.equal(requisicoes.length, quantidadeAntesDoCache);
 
   const negado = ambiente(async () => ({ ok: true, json: async () => ({
