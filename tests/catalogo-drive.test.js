@@ -63,6 +63,9 @@ function item(sobrescrever = {}) {
   assert.match(requisicoes.at(-1), /action=pdf/);
   assert.match(requisicoes.at(-1), /id=arquivoPermitido123/);
   assert.match(requisicoes.at(-1), /categoria=Matem%C3%A1tica/);
+  const quantidadeAntesDoCachePdf = requisicoes.length;
+  await valido.CatalogoDrive.obterPdf("arquivoPermitido123", "Matemática");
+  assert.equal(requisicoes.length, quantidadeAntesDoCachePdf);
 
   const capa = await valido.CatalogoDrive.obterCapa("arquivoPermitido123", "Matemática", "2026-07-30T00:00:00.000Z");
   assert.equal(capa.type, "image/png");
