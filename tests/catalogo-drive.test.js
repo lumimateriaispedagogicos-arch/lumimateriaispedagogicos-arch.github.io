@@ -38,6 +38,10 @@ function item(sobrescrever = {}) {
   assert.equal(mesclado.length, 2);
   assert.equal(mesclado[1].remoto, true);
   assert.equal("arquivo" in mesclado[1], false);
+  const imediato = valido.CatalogoDrive.carregarCache([{ titulo: "Local", categoria: "Temáticos", arquivo: "materiais/local.pdf" }]);
+  assert.equal(imediato.length, 2);
+  assert.equal(imediato[1].driveId, "arquivoPermitido123");
+  assert.match(requisicoes[0], /[?&]_=\d+/);
 
   const pdf = await valido.CatalogoDrive.obterPdf("arquivoPermitido123");
   assert.equal(pdf.blob.type, "application/pdf");

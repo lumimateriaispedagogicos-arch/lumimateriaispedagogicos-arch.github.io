@@ -34,10 +34,11 @@
     if (resposta && resposta.sucesso !== false && Array.isArray(resposta.materiais)) return resposta.materiais;
     throw new Error("Resposta do catálogo em formato inválido.");
   }
-  function lerCache(config) {
+  function lerCache(config, aceitarExpirado) {
     try {
       const cache = JSON.parse(localStorage.getItem(CACHE_KEY));
-      if (!cache || !Array.isArray(cache.materiais) || Date.now() - cache.salvoEm > config.cacheMs) return [];
+      if (!cache || !Array.isArray(cache.materiais)) return [];
+      if (!aceitarExpirado && Date.now() - cache.salvoEm > config.cacheMs) return [];
       return cache.materiais.map(function (item, i) { return converter(item, i, config); }).filter(Boolean);
     } catch (_) { return []; }
   }
@@ -79,14 +80,23 @@
   }
   async function buscar(config) {
     if (!texto(config.endpoint)) return [];
-    const materiais = listaDaResposta(await requisitarJson(config.endpoint, config))
+    const url = new URL(config.endpoint);
+    // Impede que navegador ou intermediários reutilizem uma resposta antiga.
+    url.searchParams.set("_", String(Date.now()));
+    const materiais = listaDaResposta(await requisitarJson(url.toString(), config))
       .map(function (item, i) { return converter(item, i, config); }).filter(Boolean);
     salvarCache(materiais);
     return materiais;
   }
+  function carregarCache(locais) {
+    const config = configAtual();
+    // O cache, mesmo antigo, evita o flash da versão local. Uma consulta nova
+    // começa logo em seguida e substitui estes dados.
+    return mesclar(Array.isArray(locais) ? locais : [], lerCache(config, true));
+  }
   async function carregar(locais) {
     const config = configAtual();
-    let remotos = lerCache(config);
+    let remotos = lerCache(config, false);
     try { remotos = await buscar(config); }
     catch (erro) { console.warn("LUMI: catálogo remoto indisponível; usando catálogo local/cache.", erro); }
     return mesclar(Array.isArray(locais) ? locais : [], remotos);
@@ -110,5 +120,8 @@
     return { blob: base64ParaBlob(resposta.base64, resposta.mimeType), nome: texto(resposta.nome) || "material-lumi.pdf" };
   }
 
-  window.CatalogoDrive = { carregar: carregar, obterPdf: obterPdf, mesclar: mesclar, tituloDoNome: tituloDoNome, converter: converter };
+  window.CatalogoDrive = {
+    carregar: carregar, carregarCache: carregarCache, obterPdf: obterPdf,
+    mesclar: mesclar, tituloDoNome: tituloDoNome, converter: converter
+  };
 })();
