@@ -20,7 +20,7 @@
     document.title = texto + " — LUMI Materiais Pedagógicos";
   }
 
-  function renderizar(materiais) {
+  function renderizar(materiais, carregandoDrive) {
     lista.replaceChildren();
     const cor = CORES_CATEGORIA[cat] || "#4A6FA5";
     const doAssunto = materiais.filter(function (m) {
@@ -73,7 +73,9 @@
     avulsos.forEach(function (m, i) { lista.appendChild(cartaoMaterial(m, i)); });
 
     if (colecoes.length === 0 && avulsos.length === 0) {
-      sub.innerHTML = "🌱 As atividades de <strong>" + cat + "</strong> estão chegando! Volte em breve.";
+      sub.innerHTML = carregandoDrive
+        ? "⏳ Carregando os materiais de <strong>" + cat + "</strong>..."
+        : "🌱 As atividades de <strong>" + cat + "</strong> estão chegando! Volte em breve.";
     } else if (colecoes.length > 0) {
       sub.innerHTML = "Escolha uma coleção para ver as atividades — tudo gratuito para baixar e imprimir.";
     } else {
@@ -82,6 +84,6 @@
   }
   }
 
-  renderizar(MATERIAIS);
-  renderizar(await CatalogoDrive.carregar(MATERIAIS));
+  renderizar(CatalogoDrive.carregarCache(MATERIAIS), true);
+  renderizar(await CatalogoDrive.carregar(MATERIAIS), false);
 })();
