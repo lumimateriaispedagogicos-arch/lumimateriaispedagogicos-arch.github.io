@@ -2,6 +2,7 @@
   "use strict";
 
   const CACHE_KEY = "lumi.catalogoDrive.v2";
+  const CACHE_CAPAS = "lumi.capasDrive.v1";
   const CORES = ["#4A6FA5", "#D96A5A", "#7C9A6D", "#7D62B8", "#086B8E", "#F2B33D", "#C0564B", "#E5A33F"];
   const capasEmMemoria = new Map();
   function texto(valor) { return typeof valor === "string" ? valor.trim() : ""; }
@@ -124,24 +125,54 @@
     return { blob: base64ParaBlob(resposta.base64, resposta.mimeType), nome: texto(resposta.nome) || "material-lumi.pdf" };
   }
 
-  function obterCapa(id) {
+  function chaveCapa(identificador, atualizadoEm) {
+    const origem = window.location && window.location.origin ? window.location.origin : "https://lumi.local";
+    return origem + "/.cache-lumi/capas/" + encodeURIComponent(identificador) + "/" +
+      encodeURIComponent(texto(atualizadoEm) || "sem-data");
+  }
+  async function capaPersistida(chave) {
+    if (!window.caches) return null;
+    try {
+      const resposta = await (await window.caches.open(CACHE_CAPAS)).match(chave);
+      return resposta ? await resposta.blob() : null;
+    } catch (_) { return null; }
+  }
+  async function persistirCapa(chave, blob, identificador) {
+    if (!window.caches) return;
+    try {
+      const cache = await window.caches.open(CACHE_CAPAS);
+      await cache.put(chave, new Response(blob));
+      const prefixo = chave.split(encodeURIComponent(identificador))[0] + encodeURIComponent(identificador) + "/";
+      const chaves = await cache.keys();
+      await Promise.all(chaves.filter(function (item) {
+        return item.url.indexOf(prefixo) === 0 && item.url !== chave;
+      }).map(function (item) { return cache.delete(item); }));
+    } catch (_) { /* Sem cache persistente, a capa ainda funciona nesta visita. */ }
+  }
+  function obterCapa(id, categoria, atualizadoEm) {
     const identificador = texto(id);
-    if (capasEmMemoria.has(identificador)) return capasEmMemoria.get(identificador);
+    const chave = chaveCapa(identificador, atualizadoEm);
+    if (capasEmMemoria.has(chave)) return capasEmMemoria.get(chave);
     const promessa = (async function () {
+      const persistida = await capaPersistida(chave);
+      if (persistida) return persistida;
       const config = configAtual();
       if (!texto(config.endpoint)) throw new Error("A integração com o Drive ainda não foi configurada.");
       if (!/^[A-Za-z0-9_-]{10,200}$/.test(identificador)) throw new Error("Identificador de material inválido.");
       const url = new URL(config.endpoint);
       url.searchParams.set("action", "capa"); url.searchParams.set("id", identificador);
+      url.searchParams.set("categoria", texto(categoria));
       const resposta = await requisitarJson(url.toString(), config);
       if (!resposta || resposta.sucesso !== true || resposta.id !== identificador ||
           !/^image\//.test(texto(resposta.mimeType)) || !texto(resposta.base64)) {
         throw new Error((resposta && resposta.mensagem) || "A capa não pôde ser obtida.");
       }
-      return base64ParaBlob(resposta.base64, resposta.mimeType);
+      const blob = base64ParaBlob(resposta.base64, resposta.mimeType);
+      await persistirCapa(chave, blob, identificador);
+      return blob;
     })();
-    capasEmMemoria.set(identificador, promessa);
-    promessa.catch(function () { capasEmMemoria.delete(identificador); });
+    capasEmMemoria.set(chave, promessa);
+    promessa.catch(function () { capasEmMemoria.delete(chave); });
     return promessa;
   }
 
